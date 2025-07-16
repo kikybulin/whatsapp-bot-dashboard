@@ -164,98 +164,6 @@ wa-bot/
 - CSRF protection
 - Input validation
 
-## GitHub Deployment
-
-### 1. Initialize Git Repository
-
-```bash
-cd c:\laragon\www\wa-bot
-git init
-git add .
-git commit -m "Initial commit: WhatsApp Bot Dashboard"
-```
-
-### 2. Create GitHub Repository
-
-1. Go to [GitHub](https://github.com) and log in
-2. Click "New repository" (+ icon)
-3. Name it `whatsapp-bot-dashboard` (or your preferred name)
-4. **Don't** initialize with README (we already have one)
-5. Click "Create repository"
-
-### 3. Connect Local Repository to GitHub
-
-```bash
-# Replace YOUR_USERNAME with your GitHub username
-git remote add origin https://github.com/kikybulin/whatsapp-bot-dashboard.git
-git branch -M main
-git push -u origin main
-```
-
-### 4. Deploy to Heroku (Free Option)
-
-1. **Install Heroku CLI**
-   - Download from [heroku.com](https://devcenter.heroku.com/articles/heroku-cli)
-
-2. **Login to Heroku**
-   ```bash
-   heroku login
-   ```
-
-3. **Create Heroku App**
-   ```bash
-   heroku create your-whatsapp-bot-name
-   ```
-
-4. **Set Environment Variables**
-   ```bash
-   heroku config:set SESSION_SECRET=your-secure-random-string
-   heroku config:set NODE_ENV=production
-   ```
-
-5. **Deploy**
-   ```bash
-   git push heroku main
-   ```
-
-### 5. Deploy to Railway (Alternative)
-
-1. Go to [Railway](https://railway.app)
-2. Connect your GitHub account
-3. Select your repository
-4. Set environment variables:
-   - `SESSION_SECRET`: your-secure-random-string
-   - `NODE_ENV`: production
-5. Deploy automatically
-
-### 6. Deploy to Render (Alternative)
-
-1. Go to [Render](https://render.com)
-2. Connect your GitHub account
-3. Create new Web Service
-4. Select your repository
-5. Set:
-   - **Build Command**: `npm install`
-   - **Start Command**: `npm start`
-   - **Environment Variables**:
-     - `SESSION_SECRET`: your-secure-random-string
-     - `NODE_ENV`: production
-
-### 7. Deploy to Vercel (Alternative)
-
-1. Install Vercel CLI
-   ```bash
-   npm install -g vercel
-   ```
-
-2. Login and deploy
-   ```bash
-   vercel login
-   vercel
-   ```
-
-3. Follow the prompts to deploy
-
 ## Production Deployment
 
 For production deployment:
@@ -276,6 +184,8 @@ For production deployment:
 3. Set up a reverse proxy with Nginx
 4. Use a proper database instead of JSON files
 5. Implement proper logging and monitoring
+
+**For detailed deployment instructions to various platforms (Heroku, Railway, Render, etc.), see [DEPLOYMENT.md](DEPLOYMENT.md)**
 
 ## Troubleshooting
 
