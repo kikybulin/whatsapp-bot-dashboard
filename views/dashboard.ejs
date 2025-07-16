@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Bot Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-green-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <i class="fab fa-whatsapp text-2xl mr-2"></i>
+                    <span class="text-xl font-bold">WhatsApp Bot</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/dashboard" class="hover:bg-green-700 px-3 py-2 rounded-md">
+                        <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+                    </a>
+                    <a href="/keywords" class="hover:bg-green-700 px-3 py-2 rounded-md">
+                        <i class="fas fa-key mr-2"></i>Keywords
+                    </a>
+                    <a href="/greetings" class="hover:bg-green-700 px-3 py-2 rounded-md">
+                        <i class="fas fa-hand-wave mr-2"></i>Greetings
+                    </a>
+                    <a href="/settings" class="hover:bg-green-700 px-3 py-2 rounded-md">
+                        <i class="fas fa-cog mr-2"></i>Settings
+                    </a>
+                    <div class="border-l border-green-500 h-6 mx-2"></div>
+                    <span class="text-sm">Welcome, <%= user.username %></span>
+                    <a href="/logout" class="hover:bg-red-600 px-3 py-2 rounded-md">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+            <p class="text-gray-600">Monitor and manage your WhatsApp bot</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Connection Status -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Connection Status</p>
+                        <p class="text-2xl font-bold" id="connectionStatus">
+                            <% if (isReady) { %>
+                                <span class="text-green-600">Connected</span>
+                            <% } else { %>
+                                <span class="text-red-600">Disconnected</span>
+                            <% } %>
+                        </p>
+                    </div>
+                    <div class="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-wifi text-green-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Keywords -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Active Keywords</p>
+                        <p class="text-2xl font-bold text-blue-600" id="activeKeywords">0</p>
+                    </div>
+                    <div class="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-key text-blue-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Greetings -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Active Greetings</p>
+                        <p class="text-2xl font-bold text-purple-600" id="activeGreetings">0</p>
+                    </div>
+                    <div class="h-12 w-12 bg-purple-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-hand-wave text-purple-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- QR Code Section -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8 <%= isReady ? 'hidden' : '' %>" id="qrSection">
+            <div class="text-center">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">Connect WhatsApp</h2>
+                <p class="text-gray-600 mb-6">Scan this QR code with your WhatsApp to connect</p>
+                <div id="qrCode" class="flex justify-center mb-4">
+                    <% if (qrCodeData) { %>
+                        <img src="<%= qrCodeData %>" alt="QR Code" class="max-w-xs">
+                    <% } else { %>
+                        <div class="animate-pulse bg-gray-200 w-64 h-64 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-qrcode text-4xl text-gray-400"></i>
+                        </div>
+                    <% } %>
+                </div>
+                <p class="text-sm text-gray-500">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Open WhatsApp > Settings > Linked Devices > Link a Device
+                </p>
+            </div>
+        </div>
+
+        <!-- Connected Section -->
+        <div class="bg-white rounded-lg shadow-md p-6 <%= isReady ? '' : 'hidden' %>" id="connectedSection">
+            <div class="text-center">
+                <div class="mb-6">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-check text-3xl text-green-600"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-900">WhatsApp Connected!</h2>
+                    <p class="text-gray-600">Your bot is ready to receive and respond to messages</p>
+                </div>
+                
+                <div class="flex justify-center space-x-4">
+                    <a href="/keywords" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-200">
+                        <i class="fas fa-key mr-2"></i>Manage Keywords
+                    </a>
+                    <a href="/greetings" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition duration-200">
+                        <i class="fas fa-hand-wave mr-2"></i>Manage Greetings
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        
+        socket.on('qr', (qrData) => {
+            document.getElementById('qrCode').innerHTML = `<img src="${qrData}" alt="QR Code" class="max-w-xs">`;
+            document.getElementById('qrSection').classList.remove('hidden');
+            document.getElementById('connectedSection').classList.add('hidden');
+            document.getElementById('connectionStatus').innerHTML = '<span class="text-yellow-600">Connecting...</span>';
+        });
+
+        socket.on('ready', () => {
+            document.getElementById('qrSection').classList.add('hidden');
+            document.getElementById('connectedSection').classList.remove('hidden');
+            document.getElementById('connectionStatus').innerHTML = '<span class="text-green-600">Connected</span>';
+        });
+
+        socket.on('disconnected', () => {
+            document.getElementById('qrSection').classList.add('hidden');
+            document.getElementById('connectedSection').classList.add('hidden');
+            document.getElementById('connectionStatus').innerHTML = '<span class="text-red-600">Disconnected</span>';
+        });
+
+        // Load statistics
+        async function loadStats() {
+            try {
+                const [keywordsRes, greetingsRes] = await Promise.all([
+                    fetch('/api/keywords'),
+                    fetch('/api/greetings')
+                ]);
+                
+                const keywords = await keywordsRes.json();
+                const greetings = await greetingsRes.json();
+                
+                document.getElementById('activeKeywords').textContent = keywords.filter(k => k.active).length;
+                document.getElementById('activeGreetings').textContent = greetings.filter(g => g.active).length;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        loadStats();
+    </script>
+</body>
+</html>
